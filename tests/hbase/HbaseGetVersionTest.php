@@ -6,6 +6,8 @@
  * http://www.php-pop.org/pop_config/license.html
  */
 
+use PopHbase\PopHbase;
+
 require_once dirname(__FILE__).'/../PopHbaseTestCase.php';
 
 /**
@@ -18,6 +20,6 @@ class HbaseGetVersionTest extends PopHbaseTestCase{
 	public function testReturn(){
 		$hbase = new PopHbase($this->config);
 		$version = $hbase->getVersion();
-		$this->assertSame(array('Server','REST','OS','Jersey','JVM'),array_keys($version));
+		$this->assertSame(array('REST','JVM','OS','Server','Jersey'),array_keys($version));
 	}
 }

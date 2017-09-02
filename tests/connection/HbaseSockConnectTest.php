@@ -6,6 +6,8 @@
  * http://www.php-pop.org/pop_config/license.html
  */
 
+use PopHbase\PopHbaseConnectionSock;
+
 require_once dirname(__FILE__).'/../PopHbaseTestCase.php';
 
 /**
@@ -20,7 +22,7 @@ class HbaseSockConnectTest extends PopHbaseTestCase{
 		$this->assertSame($connection,$connection->connect());
 		$version = $connection->execute('get','version')->getBody();
 		$this->assertTrue(is_array($version));
-		$this->assertSame(array('Server','REST','OS','Jersey','JVM'),array_keys($version));
+		$this->assertSame(array('REST','JVM','OS','Server','Jersey'),array_keys($version));
 		
 	}
 }

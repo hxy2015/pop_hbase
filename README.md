@@ -16,4 +16,4 @@ By default, the connection is handled by the Curl base implementation ("PopHbase
 Getting the source
 ------------------
 
-	git clone http://github.com/pop/pop_hbase.git
+	git clone http://github.com/hxy2010/pop_hbase.git

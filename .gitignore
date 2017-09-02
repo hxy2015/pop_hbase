@@ -1,2 +1,6 @@
 .*
 !.gitignore
+vendor
+composer.lock
+
+/tests/config.local.php

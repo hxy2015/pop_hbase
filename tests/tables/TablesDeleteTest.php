@@ -6,6 +6,8 @@
  * http://www.php-pop.org/pop_config/license.html
  */
 
+use PopHbase\PopHbaseTable;
+
 require_once dirname(__FILE__).'/../PopHbaseTestCase.php';
 
 /**

@@ -6,7 +6,7 @@
  * http://www.php-pop.org/pop_config/license.html
  */
 
-require_once dirname(__FILE__).'/../PopHbaseTestCase.php';
+use PopHbase\PopHbaseConnectionCurl;
 
 /**
  * Test the add method.
@@ -19,7 +19,7 @@ class HbaseCurlExecuteTest extends PopHbaseTestCase{
 		$connection = new PopHbaseConnectionCurl($this->config);
 		$version = $connection->execute('get','version')->getBody();
 		$this->assertTrue(is_array($version));
-		$this->assertSame(array('Server','REST','OS','Jersey','JVM'),array_keys($version));
+		$this->assertSame(array('REST','JVM','OS','Server','Jersey'),array_keys($version));
 		
 	}
 }
