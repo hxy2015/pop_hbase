@@ -11,6 +11,8 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
 class PopHbaseConnectionCurl implements PopHbaseConnection{
 
 	public $options;
@@ -64,11 +66,30 @@ class PopHbaseConnectionCurl implements PopHbaseConnection{
 	 * 
 	 * @return PopHbaseResponse Response object parsing the HTTP HBase response.
 	 */
-	public function execute($method,$url,$data=null,$raw=false) {
+	public function execute($method, $url, $data = null, $raw = false, $timestamp = null) {
 		$url = (substr($url, 0, 1) == '/' ? $url : '/'.$url);
-		if(is_array($data)){
-			$data = json_encode($data);
-		}
+
+        if(is_array($data)){
+            $data = json_encode($data);
+        }
+
+        $method = strtoupper($method);
+
+        if (isset($timestamp) && $method == 'PUT') {
+            $curl_hhtp_headers =  array(
+                'Content-Type: application/octet-stream',
+                'Accept: application/octet-stream',
+                'Connection: ' . ( $this->options['alive'] ? 'Keep-Alive' : 'Close' ),
+                'X-Timestamp: ' . $timestamp
+            );
+        } else {
+            $curl_hhtp_headers =  array(
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Connection: ' . ( $this->options['alive'] ? 'Keep-Alive' : 'Close' )
+            );
+        }
+
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, 'http://'.$this->options['host'].':'.$this->options['port'].$url);
 		curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
@@ -76,23 +97,19 @@ class PopHbaseConnectionCurl implements PopHbaseConnection{
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($curl, CURLOPT_MAXREDIRS, 3);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'Content-Type: application/json',
-			'Accept: application/json',
-			'Connection: ' . ( $this->options['alive'] ? 'Keep-Alive' : 'Close' ),
-		));
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $curl_hhtp_headers);
 		curl_setopt($curl, CURLOPT_VERBOSE, !empty($this->options['verbose'])); 
-		switch(strtoupper($method)){
+		switch($method){
 			case 'DELETE':
 				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
 				break;
 			case 'PUT':
 				curl_setopt($curl, CURLOPT_PUT, 1);
-				$file = tmpfile();
-				fwrite($file, $data);
-				fseek($file, 0);
-				curl_setopt($curl, CURLOPT_INFILE, $file);
-				curl_setopt($curl, CURLOPT_INFILESIZE, strlen($data));
+                $file = tmpfile();
+                fwrite($file, $data);
+                fseek($file, 0);
+                curl_setopt($curl, CURLOPT_INFILE, $file);
+                curl_setopt($curl, CURLOPT_INFILESIZE, strlen($data));
 				break;
 			case 'POST':
 				curl_setopt($curl, CURLOPT_POST, 1);
@@ -124,7 +141,8 @@ class PopHbaseConnectionCurl implements PopHbaseConnection{
 				fclose($file); 
 				break;
 		}
-		return new PopHbaseResponse($headers,$body,$raw);
+
+		return new PopHbaseResponse($headers, $body, $raw);
 	}
 
 }

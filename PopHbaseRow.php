@@ -11,6 +11,8 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
 class PopHbaseRow{
 	
 	public $hbase;
@@ -88,14 +90,54 @@ class PopHbaseRow{
 	 *            ->row('my_row')
 	 *                ->get('my_column_family:my_column');
 	 */
-	public function get($column){
-		$body = $this->hbase->request->get($this->table .'/'.$this->key.'/'.$column)->body;
+	public function get($column, $timestamp=null){
+        $getUrl = $this->table .'/'.$this->key.'/'.$column;
+        $getUrl .= (isset($timestamp)) ? '/'.($timestamp+1).','.($timestamp+2) : '';
+
+		$body = $this->hbase->request->get($getUrl)->body;
+
 		if(is_null($body)){
 			return null;
 		}
+
+        if (isset($timestamp)) {
+            $result_arr = $this->parseMultiRowBody($body);
+            if (empty($result_arr)) {
+                return null;
+            }
+            return $result_arr[0]['data'];
+        }
+
 		return base64_decode($body['Row'][0]['Cell'][0]['$']);
 	}
-	
+
+    public function multiGet($column, $count = 100)
+    {
+        $body = $this->hbase->request->get($this->table .'/'.$this->key.'/'.$column . '/?v=' . $count)->body;
+        if(is_null($body)){
+            return null;
+        }
+        return $this->parseMultiRowBody($body);
+    }
+
+    private function parseMultiRowBody($body)
+    {
+        $bodyArray = json_decode($body, true);
+
+        $result = array();
+
+        if (isset($bodyArray['Row'][0]['Cell']) && $bodyArray['Row'][0]['Cell'] > 0) {
+            foreach ($bodyArray['Row'][0]['Cell'] as $key => $value) {
+                $result[] = array(
+                    'timestamp' => $value['timestamp'],
+                    'data'      => base64_decode($value['$'])
+                );
+            }
+        }
+
+        return $result;
+    }
+
 	/**
 	 * Create or update a column row.
 	 * 
@@ -108,17 +150,19 @@ class PopHbaseRow{
 	 * 
 	 * Note, in HBase, creation and modification of a column value is the same concept.
 	 */
-	public function put($column,$value){
-		$value = array(
-			'Row' => array(array(
-				'key' => base64_encode($this->key),
-				'Cell' => array(array(
-					'column' => base64_encode($column),
-					'$' => base64_encode($value)
-				))
-			))
-		);
-		$this->hbase->request->put($this->table .'/'.$this->key.'/'.$column,$value);
+	public function put($column,$value,$timestamp=null){
+        if (!isset($timestamp)) {
+            $value = array(
+                'Row' => array(array(
+                    'key' => base64_encode($this->key),
+                    'Cell' => array(array(
+                        'column' => base64_encode($column),
+                        '$' => base64_encode($value)
+                    ))
+                ))
+            );
+        }
+		$this->hbase->request->put($this->table .'/'.$this->key.'/'.$column,$value,$timestamp);
 		return $this;
 	}
 

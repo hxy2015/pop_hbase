@@ -11,6 +11,10 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
+use InvalidArgumentException;
+
 class PopHbaseTables extends PopHbaseIterator{
 	
 	public $hbase;

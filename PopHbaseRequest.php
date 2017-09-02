@@ -11,6 +11,8 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
 class PopHbaseRequest{
 
 	public $hbase;
@@ -38,7 +40,7 @@ class PopHbaseRequest{
 	 * 
 	 * @return PopHbaseResponse Response object
 	 */
-	public function get($command){
+	public function get($command, $timestamp=null){
 		return $this->hbase->connection->execute('GET',$command);
 	}
 	
@@ -56,8 +58,8 @@ class PopHbaseRequest{
 	 * 
 	 * @return PopHbaseResponse Response object
 	 */
-	public function put($command,$data=null){
-		return $this->hbase->connection->execute('PUT',$command,$data);
+	public function put($command,$data=null, $timestamp = null){
+		return $this->hbase->connection->execute('PUT',$command,$data,true,$timestamp);
 	}
 
 }

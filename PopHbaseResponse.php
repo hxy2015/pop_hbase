@@ -11,12 +11,19 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
 class PopHbaseResponse{
 	
-	public function __construct($headers,$body,$raw=false) {
+	public function __construct($headers, $body, $raw = true) {
 		$this->headers = $headers;
-		$this->body = $raw?$body:json_decode($body,true);
+		$this->body = $raw ? $body : json_decode($body,true);
 		$this->raw = $raw;
+//		var_dump($headers);
+//		var_dump($raw);
+//		var_dump($this->body);
+//		die();
+
 //		preg_match('/^(\d{3})/',trim($this->headers['status']),$matches);
 //		echo $this->headers['status'].' - '.$matches[1]."\n";
 //		$status = $matches[1];
@@ -33,10 +40,10 @@ class PopHbaseResponse{
 //		}
 //	}
 	
-	public function __call($method,$args) {
-		switch($method){
+	public function __call($method, $args) {
+		switch ($method) {
 			case 'body':
-				return call_user_func_array(array($this,'getBody'),$args);
+				return call_user_func_array(array($this, 'getBody'), $args);
 		}
 	}
 	

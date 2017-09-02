@@ -11,6 +11,10 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
+use Exception;
+
 class PopHbaseException extends Exception{
 
 }

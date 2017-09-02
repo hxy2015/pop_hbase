@@ -11,7 +11,9 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
-abstract class PopHbaseIterator implements Countable, Iterator{
+namespace PopHbase;
+
+abstract class PopHbaseIterator implements \Countable, \Iterator{
 
 	
 	//public $data = array();

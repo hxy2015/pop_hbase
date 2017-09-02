@@ -11,6 +11,8 @@
  *
  * @author		David Worms info(at)adaltas.com
  */
+namespace PopHbase;
+
 interface PopHbaseConnection{
 	
 	/**
